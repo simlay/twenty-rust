@@ -1,0 +1,7 @@
+[package]
+name = "twenty-rust"
+version = "0.1.0"
+authors = ["Sebastian Imlay <sebastian.imlay@gmail.com>"]
+
+[dependencies]
+stdweb = { path = "../stdweb/" }
