@@ -33,8 +33,8 @@ use stdweb::unstable::TryInto;
 use game::{
     TILE_WIDTH,
     TILE_HEIGHT,
-    VIRTICAL_TILES,
-    HORIZONTAL_TILES,
+    GRID_WIDTH,
+    GRID_HEIGHT,
     Game,
 };
 
@@ -59,8 +59,8 @@ fn main() {
     ).unwrap().unwrap().try_into().unwrap();
     let context: CanvasRenderingContext2d = canvas.get_context().unwrap();
 
-    canvas.set_width((TILE_WIDTH*HORIZONTAL_TILES) as u32);
-    canvas.set_height((TILE_HEIGHT*VIRTICAL_TILES) as u32);
+    canvas.set_width((TILE_WIDTH as u32*GRID_WIDTH as u32) as u32);
+    canvas.set_height((TILE_HEIGHT as u32*GRID_HEIGHT as u32) as u32);
 
     let rc = Rc::new(RefCell::new(Game::new(context)));
 
@@ -70,6 +70,7 @@ fn main() {
             rc.borrow_mut().animate(time, rc.clone());
         });
     });
+
     enclose!((rc) {
         canvas.add_event_listener(move |event: MouseDownEvent| {
             rc.borrow_mut().mouse_down(event);
