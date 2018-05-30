@@ -299,8 +299,8 @@ impl Game {
             ) {
                 true => {
                     let (x_tile, y_tile) = self.get_tile_coordinates(tile.x, tile.y);
-                    if self.grid[x_tile][y_tile] == tile.value {
-                        self.grid[x_tile][y_tile] += 1;
+                    if self.grid[x_tile][min(y_tile + 1, GRID_HEIGHT - 1)] == tile.value {
+                        self.grid[x_tile][min(y_tile + 1, GRID_HEIGHT - 1)] += 1;
                     } else if self.grid[x_tile][y_tile] == 0 {
                         self.grid[x_tile][y_tile] = tile.value;
                     }
@@ -314,7 +314,7 @@ impl Game {
             .filter(|tile| {
             !self.collision(
              tile.x,
-             tile.y,
+             tile.y + delta_y,
             ) && tile.y < TILE_HEIGHT as i32 * GRID_HEIGHT as i32
         })
         .map(|tile| {
