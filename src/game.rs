@@ -204,7 +204,10 @@ impl Game {
         self.drag_tile = self.take_tile(event.client_x(), event.client_y());
         match self.drag_tile {
             Some(ref tile) => {
-                let (x_tile, y_tile) = self.get_tile_coordinates(tile.x, tile.y);
+                let (x_tile, y_tile) = self.get_tile_coordinates(
+                    tile.x,
+                    tile.y
+                );
                 self.grid[x_tile][y_tile] = 0;
             },
             None => {
@@ -213,29 +216,32 @@ impl Game {
     }
 
     fn collision(&self, center_x: i32, center_y: i32) -> bool {
-        let tile_height = TILE_HEIGHT as i32 - 50;
-        let tile_width = TILE_WIDTH as i32 - 50;
+        let tile_height = TILE_HEIGHT as i32 - 10;
+        let tile_width = TILE_WIDTH as i32 - 10;
         let corners = [
-            (center_x - tile_width/2, center_y - tile_height/2),
-            (center_x + tile_width/2, center_y + tile_height/2),
-            (center_x - tile_width/2, center_y + tile_height/2),
-            (center_x + tile_width/2, center_y - tile_height/2),
+            (center_x - (tile_width/2), center_y - (tile_height/2)),
+            (center_x + (tile_width/2), center_y + (tile_height/2)),
+            (center_x - (tile_width/2), center_y + (tile_height/2)),
+            (center_x + (tile_width/2), center_y - (tile_height/2)),
         ];
 
         let mut collided = false;
-        let max_x : i32 = TILE_WIDTH as i32 * GRID_WIDTH as i32;
-        let max_y : i32 = TILE_HEIGHT as i32 * GRID_HEIGHT as i32;
+        let max_x : i32 = TILE_WIDTH as i32 * GRID_WIDTH as i32 + 10;
+        let max_y : i32 = TILE_HEIGHT as i32 * GRID_HEIGHT as i32 + 10;
+
+        //console!(log, center_x, center_y);
 
         for (x, y) in corners.iter() {
             let (x_tile, y_tile) = self.get_tile_coordinates(*x, *y);
-            if (self.grid[x_tile][y_tile] != 0 ||
-                x < &0 ||
-                y < &0 ||
-                x > &max_x ||
-                y > &max_y
-            ) {
-                collided = true
-            }
+            if self.grid[x_tile][y_tile] != 0 ||
+                *x < 0 ||
+                *y < 0 ||
+                *x > max_x ||
+                *y > max_y
+                {
+                    collided = true;
+                    break;
+                }
         }
         collided
     }
@@ -266,10 +272,9 @@ impl Game {
                     match self.grid[x_tile][y_tile] {
                         0 => {
                             //self.grid[x_tile][y_tile] = tile.value;
-
                             // This is for air tiles
                             let (tile_x, _) = self.get_tile_coordinates(tile.x, tile.y);
-                            tile.x = (1 + tile_x as i32)*(TILE_WIDTH as i32) - (TILE_WIDTH as i32)/2;
+                            tile.x = (tile_x as i32)*(TILE_WIDTH as i32) + (TILE_WIDTH as i32)/2;
                             self.air_tiles.push(tile);
                         },
                         _ => {
@@ -289,12 +294,11 @@ impl Game {
 
         for tile in self.air_tiles.iter() {
             match self.collision(
-                tile.x + (TILE_WIDTH as i32)/2,
-                tile.y + (TILE_HEIGHT as i32)/2,
+                tile.x,
+                tile.y  + delta_y,
             ) {
                 true => {
                     let (x_tile, y_tile) = self.get_tile_coordinates(tile.x, tile.y);
-                    console!(log, tile.x, tile.y, tile.value, x_tile as i32, y_tile as i32);
                     if self.grid[x_tile][y_tile] == tile.value {
                         self.grid[x_tile][y_tile] += 1;
                     } else if self.grid[x_tile][y_tile] == 0 {
@@ -306,12 +310,14 @@ impl Game {
             }
         }
 
-        self.air_tiles = self.air_tiles.iter().filter(|tile| {
+        self.air_tiles = self.air_tiles.iter()
+            .filter(|tile| {
             !self.collision(
-             tile.x - (TILE_WIDTH as i32)/2,
-             tile.y - (TILE_HEIGHT as i32)/2,
+             tile.x,
+             tile.y,
             ) && tile.y < TILE_HEIGHT as i32 * GRID_HEIGHT as i32
-        }).map(|tile| {
+        })
+        .map(|tile| {
             Tile::new(tile.x, tile.y + delta_y, tile.value)
         }).collect();
     }
