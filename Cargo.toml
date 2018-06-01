@@ -4,4 +4,4 @@ version = "0.1.0"
 authors = ["Sebastian Imlay <sebastian.imlay@gmail.com>"]
 
 [dependencies]
-stdweb = { path = "../stdweb/" }
+stdweb = { git = "https://github.com/simlay/stdweb.git" }
